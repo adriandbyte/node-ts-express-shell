@@ -1,4 +1,4 @@
-import nodemailer, { Transporter } from "nodemailer";
+import nodemailer, { Transporter } from 'nodemailer';
 
 export interface SendMailOptions {
   to: string | string[];
@@ -12,28 +12,40 @@ export interface Attachement {
   path: string;
 }
 
+
 export class EmailService {
+
   private transporter: Transporter;
+
 
   constructor(
     mailerService: string,
     mailerEmail: string,
-    senderEmailPassword: string
+    senderEmailPassword: string,
+    private readonly postToProvider: boolean,
   ) {
-    this.transporter = nodemailer.createTransport({
+
+    this.transporter = nodemailer.createTransport( {
       service: mailerService,
       auth: {
         user: mailerEmail,
         pass: senderEmailPassword,
-      },
+      }
     });
+
   }
 
-  async sendEmail(options: SendMailOptions): Promise<boolean> {
+
+  async sendEmail( options: SendMailOptions ): Promise<boolean> {
+
     const { to, subject, htmlBody, attachements = [] } = options;
 
+
     try {
-      const sentInformation = await this.transporter.sendMail({
+
+      if ( !this.postToProvider ) return true;
+
+      const sentInformation = await this.transporter.sendMail( {
         to: to,
         subject: subject,
         html: htmlBody,
@@ -43,8 +55,13 @@ export class EmailService {
       // console.log( sentInformation );
 
       return true;
-    } catch (error) {
+    } catch ( error ) {
+      console.log(error);
       return false;
     }
+
   }
+
+
+
 }
